@@ -214,7 +214,7 @@ public class Login extends javax.swing.JFrame {
         if (result.equals("ok")) {
             showMessage("Login succesfully!");
             boolean isLoggedIn = true;
-            clientCtr.listenForInvites();
+            clientCtr.listenForInvites(jTextField1.getText());
             new MainWindow(jTextField1.getText() , clientCtr);
             this.dispose();
         } else {

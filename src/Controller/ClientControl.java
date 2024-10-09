@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import Model.User;
+import View.CircleSquareGame;
 import View.ClientView;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -17,6 +18,7 @@ public class ClientControl {
     private int serverPort = 8888;
     private ObjectOutputStream oos; // Tái sử dụng chung cho tất cả các yêu cầu
     private ObjectInputStream ois;  // Tái sử dụng chung cho tất cả các yêu cầu
+    private User user;
     public List<String> onlineUsers = new ArrayList<>();
 
     public ClientControl() {
@@ -134,7 +136,7 @@ public class ClientControl {
     }
 
     // Lắng nghe lời mời từ server trong một Thread riêng
-    public void listenForInvites() {
+    public void listenForInvites( String username) {
         new Thread(() -> {
             while (true) {
                 try {
@@ -151,6 +153,11 @@ public class ClientControl {
                             String invitee = command.split(":")[1]; // Người được mời
                             String inviteeResponse = command.split(":")[2]; // Phản hồi ("accept" hoặc "decline")
                             handleInviteResponse(invitee, inviteeResponse); // Xử lý phản hồi lời mời
+                        }
+                        if (command.startsWith("gameStart:")) {
+                            // Tách tên người chơi đối thủ từ thông báo
+                            String opponent = command.split(":")[1];
+                            new CircleSquareGame(username, opponent);
                         }
                     } // Xử lý danh sách người dùng online
                     else if (response instanceof List) {
@@ -185,27 +192,6 @@ public class ClientControl {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    // Lắng nghe phản hồi lời mời
-    public void listenForInviteResponse() {
-        new Thread(() -> {
-            while (true) {
-                try {
-                    Object response = ois.readObject(); // Nhận dữ liệu từ server
-                    if (response instanceof String) {
-                        String command = (String) response;
-                        if (command.startsWith("inviteResponse:")) {
-                            String invitee = command.split(":")[1]; // Người được mời
-                            String inviteeResponse = command.split(":")[2]; // Phản hồi ("accept" hoặc "decline")
-                            handleInviteResponse(invitee, inviteeResponse); // Xử lý phản hồi lời mời
-                        }
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     // Xử lý phản hồi lời mời

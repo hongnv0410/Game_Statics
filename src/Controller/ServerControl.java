@@ -205,13 +205,28 @@ public class ServerControl {
         }
 
         private void sendInviteResponseToInviter(String inviter, String invitee, String response) throws IOException {
+            ClientHandler inviterHandler = null;
+            ClientHandler inviteeHandler = null;
+
+            // Tìm kiếm ClientHandler của người mời và người được mời
             for (ClientHandler client : clients) {
                 if (client.user != null && client.user.getUserName().equals(inviter)) {
-                    client.oos.writeObject("inviteResponse:" + invitee + ":" + response); // Gửi phản hồi tới người mời
-                    client.oos.flush();
-                    System.out.println(invitee + " đã " + response + " lời mời từ " + inviter);
-                    break;
+                    inviterHandler = client; // Lưu lại ClientHandler của người mời
+                } else if (client.user != null && client.user.getUserName().equals(invitee)) {
+                    inviteeHandler = client; // Lưu lại ClientHandler của người được mời
                 }
+            }
+
+            // Nếu cả hai người chơi đều tồn tại và lời mời được chấp nhận
+            if (inviterHandler != null && inviteeHandler != null && response.equals("accept")) {
+                // Gửi thông báo tới cả hai người chơi
+                inviterHandler.oos.writeObject("gameStart:" + invitee);
+                inviteeHandler.oos.writeObject("gameStart:" + inviter);
+
+                inviterHandler.oos.flush();
+                inviteeHandler.oos.flush();
+
+                System.out.println("Phòng chơi đã được tạo cho " + inviter + " và " + invitee);
             }
         }
 

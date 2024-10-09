@@ -20,12 +20,13 @@ public class CircleSquareGame extends JFrame {
     private ArrayList<DraggableCircle> circles = new ArrayList<>(); // Danh sách các hình tròn
     private Image backgroundImage; // Hình ảnh nền
     private String username;
+    private String opponentName;
 
-    public CircleSquareGame(String username) {
+    public CircleSquareGame(String username, String opponentName) {
         this.username = username; // Gán tên người dùng
-
+        this.opponentName = opponentName;
         // Thiết lập JFrame
-        setTitle("Tấm nhặt thóc");
+        setTitle("Trận đấu giữa " + username + " và " + opponentName);
         setSize(570, 600);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(null);
@@ -50,7 +51,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.setLayout(null);
         setContentPane(backgroundPanel); // Đặt JPanel làm nền
         // Thêm nhãn hiển thị tên người dùng
-        usernameLabel = new JLabel("hello, " + username); // Khởi tạo JLabel với tên người dùng
+        usernameLabel = new JLabel( username+" vs " + opponentName); // Khởi tạo JLabel với tên người dùng
         usernameLabel.setForeground(Color.BLACK); // Màu chữ
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Đặt phông chữ
         usernameLabel.setBounds(0, 10, 570, 30); // Đặt vị trí và kích thước
@@ -58,7 +59,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(usernameLabel);
 
         // Thêm nhãn chữ "Điểm:"
-        scoreTextLabel = new JLabel("Điểm:");
+        scoreTextLabel = new JLabel(username+":");
         scoreTextLabel.setForeground(Color.BLACK); // Màu chữ
         scoreTextLabel.setBounds(15, 10, 50, 20); // Vị trí của nhãn "Điểm"
         backgroundPanel.add(scoreTextLabel);
@@ -71,7 +72,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(scoreLabel);
 
         // Thêm nhãn chữ "Điểm đối thủ:"
-        opponentScoreTextLabel = new JLabel("Điểm đối thủ:");
+        opponentScoreTextLabel = new JLabel(opponentName+":");
         opponentScoreTextLabel.setForeground(Color.BLACK); // Màu chữ
         opponentScoreTextLabel.setBounds(410, 10, 100, 20); // Vị trí của nhãn "Điểm đối thủ"
         backgroundPanel.add(opponentScoreTextLabel);
@@ -143,7 +144,7 @@ public class CircleSquareGame extends JFrame {
     }
 
     public static void main(String[] args) {
-        new CircleSquareGame("hello");
+        new CircleSquareGame("hello" , "hello1");
     }
 
     // Lớp ImageSquare để hiển thị hình vuông với hình ảnh
@@ -253,4 +254,3 @@ public class CircleSquareGame extends JFrame {
         }
     }
 }
-    
