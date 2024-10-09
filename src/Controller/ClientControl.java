@@ -20,6 +20,7 @@ public class ClientControl {
     private ObjectInputStream ois;  // Tái sử dụng chung cho tất cả các yêu cầu
     private User user;
     public List<String> onlineUsers = new ArrayList<>();
+    private CircleSquareGame CSG = null;
 
     public ClientControl() {
     }
@@ -136,7 +137,7 @@ public class ClientControl {
     }
 
     // Lắng nghe lời mời từ server trong một Thread riêng
-    public void listenForInvites( String username) {
+    public void listenForInvites(String username) {
         new Thread(() -> {
             while (true) {
                 try {
@@ -157,7 +158,12 @@ public class ClientControl {
                         if (command.startsWith("gameStart:")) {
                             // Tách tên người chơi đối thủ từ thông báo
                             String opponent = command.split(":")[1];
-                            new CircleSquareGame(username, opponent);
+                            CSG = new CircleSquareGame(username, opponent);
+                        }
+                        if (command.startsWith("scoreOPP:")) {
+                            int scoreOPP = Integer.parseInt(command.split(":")[1]);
+                            System.out.println("da nhan diem " +scoreOPP);
+                            CSG.updateScoreOpp(scoreOPP);
                         }
                     } // Xử lý danh sách người dùng online
                     else if (response instanceof List) {
@@ -206,6 +212,16 @@ public class ClientControl {
 
     public void getOnlineUser() {
         sendCommand("getOnlineUsers");
+    }
+
+    public void sendScore(int score, String opponentName) {
+        try {
+            System.out.println("sendScore:" + score + ":" + opponentName);
+            oos.writeObject("sendScore:" + score + ":" + opponentName); // Gửi phản hồi lời mời về server
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

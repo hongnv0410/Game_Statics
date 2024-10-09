@@ -1,5 +1,6 @@
 package View;
 
+import Controller.ClientControl;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -21,8 +22,11 @@ public class CircleSquareGame extends JFrame {
     private Image backgroundImage; // Hình ảnh nền
     private String username;
     private String opponentName;
+    private ClientControl ClientCtr;
 
     public CircleSquareGame(String username, String opponentName) {
+        ClientCtr = new ClientControl();
+        ClientCtr.openConnection();
         this.username = username; // Gán tên người dùng
         this.opponentName = opponentName;
         // Thiết lập JFrame
@@ -51,7 +55,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.setLayout(null);
         setContentPane(backgroundPanel); // Đặt JPanel làm nền
         // Thêm nhãn hiển thị tên người dùng
-        usernameLabel = new JLabel( username+" vs " + opponentName); // Khởi tạo JLabel với tên người dùng
+        usernameLabel = new JLabel(username + " vs " + opponentName); // Khởi tạo JLabel với tên người dùng
         usernameLabel.setForeground(Color.BLACK); // Màu chữ
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Đặt phông chữ
         usernameLabel.setBounds(0, 10, 570, 30); // Đặt vị trí và kích thước
@@ -59,7 +63,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(usernameLabel);
 
         // Thêm nhãn chữ "Điểm:"
-        scoreTextLabel = new JLabel(username+":");
+        scoreTextLabel = new JLabel(username + ":");
         scoreTextLabel.setForeground(Color.BLACK); // Màu chữ
         scoreTextLabel.setBounds(15, 10, 50, 20); // Vị trí của nhãn "Điểm"
         backgroundPanel.add(scoreTextLabel);
@@ -72,7 +76,7 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(scoreLabel);
 
         // Thêm nhãn chữ "Điểm đối thủ:"
-        opponentScoreTextLabel = new JLabel(opponentName+":");
+        opponentScoreTextLabel = new JLabel(opponentName + ":");
         opponentScoreTextLabel.setForeground(Color.BLACK); // Màu chữ
         opponentScoreTextLabel.setBounds(410, 10, 100, 20); // Vị trí của nhãn "Điểm đối thủ"
         backgroundPanel.add(opponentScoreTextLabel);
@@ -140,11 +144,14 @@ public class CircleSquareGame extends JFrame {
 
     // Phương thức cập nhật điểm của đối thủ
     public void updateOpponentScore(int points) {
-
     }
 
     public static void main(String[] args) {
-        new CircleSquareGame("hello" , "hello1");
+        new CircleSquareGame("hello", "hello1");
+    }
+
+    public void updateScoreOpp(int score) {
+        opponentScoreLabel.setText(String.valueOf(score));
     }
 
     // Lớp ImageSquare để hiển thị hình vuông với hình ảnh
@@ -209,9 +216,7 @@ public class CircleSquareGame extends JFrame {
                             score++; // Tăng điểm cho người chơi
                             scoreLabel.setText(String.valueOf(score));
                             square1.showPlusOne(); // Hiển thị "+1" trên hình vuông
-                        } else {
-                            opponentScore++; // Nếu sai, cộng điểm cho đối thủ
-                            opponentScoreLabel.setText(String.valueOf(opponentScore));
+                            ClientCtr.sendScore(score, opponentName);
                         }
                         animateScoreLabel(); // Thêm hiệu ứng cho nhãn số điểm
                         setVisible(false); // Ẩn hình tròn khi đưa vào hình vuông
@@ -222,9 +227,7 @@ public class CircleSquareGame extends JFrame {
                             score++; // Tăng điểm cho người chơi
                             scoreLabel.setText(String.valueOf(score));
                             square2.showPlusOne(); // Hiển thị "+1" trên hình vuông
-                        } else {
-                            opponentScore++; // Nếu sai, cộng điểm cho đối thủ
-                            opponentScoreLabel.setText(String.valueOf(opponentScore));
+                            ClientCtr.sendScore(score, opponentName);
                         }
                         animateScoreLabel();
                         setVisible(false);

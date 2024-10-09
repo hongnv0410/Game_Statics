@@ -124,6 +124,10 @@ public class ServerControl {
                     String inviter = parts[1]; // Người đã mời
                     String response = parts[2]; // Phản hồi ("accept" hoặc "decline")
                     sendInviteResponseToInviter(inviter, this.user.getUserName(), response); // Gửi phản hồi tới người mời
+                }else if(command.startsWith("sendScore:")){
+                    int score =Integer.parseInt(command.split(":")[1]) ;
+                    String opponentName = command.split(":")[2];
+                    sendInviteScore(score, opponentName);
                 }
 
             }
@@ -227,6 +231,16 @@ public class ServerControl {
                 inviteeHandler.oos.flush();
 
                 System.out.println("Phòng chơi đã được tạo cho " + inviter + " và " + invitee);
+            }
+        }
+        
+        private void sendInviteScore(int score, String opponentName) throws IOException{
+            for (ClientHandler client : clients) {
+                if (client.user != null && client.user.getUserName().equals(opponentName)) {
+                    client.oos.writeObject("scoreOPP:" + score);
+                    client.oos.flush();
+                    return;
+                } 
             }
         }
 
