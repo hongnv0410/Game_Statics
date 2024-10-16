@@ -14,8 +14,8 @@ import javax.swing.JOptionPane;
 public class ClientControl {
 
     private Socket mySocket;
-    private String serverHost = "127.0.0.1";
-    private int serverPort = 8888;
+    private String serverHost = "localhost";
+    private int serverPort = 8889;
     private ObjectOutputStream oos; // Tái sử dụng chung cho tất cả các yêu cầu
     private ObjectInputStream ois;  // Tái sử dụng chung cho tất cả các yêu cầu
     private User user;
@@ -165,6 +165,14 @@ public class ClientControl {
                             System.out.println("da nhan diem " +scoreOPP);
                             CSG.updateScoreOpp(scoreOPP);
                         }
+                        if (command.startsWith("timeOPP:")) {
+                            int timeOPP = Integer.parseInt(command.split(":")[1]);
+                            System.out.println("da nhan thoi gian hoan thanh" +timeOPP);
+                            CSG.updateStatusOpponent(timeOPP);
+                        }
+                        if (command.startsWith("Notification")) {
+                            CSG.opponentOut();
+                        }
                     } // Xử lý danh sách người dùng online
                     else if (response instanceof List) {
                         onlineUsers = (List<String>) response; // Ép kiểu về danh sách
@@ -223,6 +231,17 @@ public class ClientControl {
             e.printStackTrace();
         }
     }
+    
+    public void sendTime(int time, String opponentName) {
+        try {
+            System.out.println("sendTime:" + time + ":" + opponentName);
+            oos.writeObject("sendTime:" + time + ":" + opponentName); // Gửi thời gian chơi về server
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }
 
 // Class chạy client

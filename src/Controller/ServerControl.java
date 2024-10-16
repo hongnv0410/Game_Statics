@@ -19,12 +19,12 @@ public class ServerControl {
 
     private Connection con; // Kết nối với cơ sở dữ liệu
     private ServerSocket myServer; // Cổng máy chủ
-    private final int serverPort = 8888; // Số cổng cho máy chủ
+    private final int serverPort = 8889; // Số cổng cho máy chủ
     private List<ClientHandler> clients = new ArrayList<>(); // Danh sách các khách hàng kết nối
     private ExecutorService pool = Executors.newFixedThreadPool(10); // Hồ bơi luồng để xử lý khách hàng
 
     public ServerControl() {
-        getDBConnection("test", "root", ""); // Kết nối đến cơ sở dữ liệu
+        getDBConnection("test", "root", "123456"); // Kết nối đến cơ sở dữ liệu
         openServer(serverPort); // Mở máy chủ
         while (true) {
             listenForClients(); // Liên tục lắng nghe các kết nối từ khách hàng
@@ -70,7 +70,25 @@ public class ServerControl {
         private ObjectInputStream ois; // Đầu vào đối tượng
         private User user; // Thông tin người dùng
         private boolean IsLogin = false;
+        private boolean IsPlay  = false;
+        private String opponentName = null;
+        
+        public boolean isIsPlay() {
+            return IsPlay;
+        }
 
+        public void setIsPlay(boolean IsPlay) {
+            this.IsPlay = IsPlay;
+        }
+
+        public String getOpponentName() {
+            return opponentName;
+        }
+
+        public void setOpponentName(String opponentName) {
+            this.opponentName = opponentName;
+        }
+        
         public ClientHandler(Socket socket) {
             this.clientSocket = socket; // Lưu kết nối khách hàng
         }
@@ -129,6 +147,13 @@ public class ServerControl {
                     String opponentName = command.split(":")[2];
                     sendInviteScore(score, opponentName);
                 }
+                else if(command.startsWith("sendTime:")){
+                    int time =Integer.parseInt(command.split(":")[1]) ;
+                    String opponentName = command.split(":")[2];
+                    sendInviteTime(time, opponentName);
+                    IsPlay = false;
+                    opponentName = null;
+                }
 
             }
         }
@@ -181,6 +206,13 @@ public class ServerControl {
 
         private void closeConnection() {
             try {
+                if(IsPlay == true)
+                {
+                    System.out.println("1");
+                    sendNotification(opponentName);
+                    IsPlay = false;
+                    opponentName = null;
+                }
                 if (ois != null) {
                     ois.close(); // Đóng ObjectInputStream
                 }
@@ -190,6 +222,7 @@ public class ServerControl {
                 if (clientSocket != null && !clientSocket.isClosed()) {
                     clientSocket.close(); // Đóng socket nếu chưa đóng
                 }
+                
                 clients.remove(this); // Xóa client khỏi danh sách quản lý
                 System.out.println("Client disconnected: " + clientSocket.getInetAddress()); // Thông báo ngắt kết nối
             } catch (IOException e) {
@@ -229,6 +262,12 @@ public class ServerControl {
 
                 inviterHandler.oos.flush();
                 inviteeHandler.oos.flush();
+                // Thêm thuộc tính đàn chơi game
+                inviterHandler.setIsPlay(true); 
+                inviteeHandler.setIsPlay(true);
+                //Thêm tên đối thủ khi chấp nhận chơi
+                inviterHandler.setOpponentName(invitee); 
+                inviteeHandler.setOpponentName(inviter);
 
                 System.out.println("Phòng chơi đã được tạo cho " + inviter + " và " + invitee);
             }
@@ -238,6 +277,24 @@ public class ServerControl {
             for (ClientHandler client : clients) {
                 if (client.user != null && client.user.getUserName().equals(opponentName)) {
                     client.oos.writeObject("scoreOPP:" + score);
+                    client.oos.flush();
+                    return;
+                } 
+            }
+        }
+        private void sendInviteTime(int time, String opponentName) throws IOException{
+            for (ClientHandler client : clients) {
+                if (client.user != null && client.user.getUserName().equals(opponentName)) {
+                    client.oos.writeObject("timeOPP:" + time);
+                    client.oos.flush();
+                    return;
+                } 
+            }
+        }
+        private void sendNotification(String opponentName) throws IOException{
+            for (ClientHandler client : clients) {
+                if (client.user != null && client.user.getUserName().equals(opponentName)) {
+                    client.oos.writeObject("Notification");
                     client.oos.flush();
                     return;
                 } 

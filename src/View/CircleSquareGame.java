@@ -3,6 +3,8 @@ package View;
 import Controller.ClientControl;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -11,24 +13,33 @@ import java.util.Random;
 public class CircleSquareGame extends JFrame {
 
     private int score = 0;
-    private int opponentScore = 0; // Điểm của đối thủ
-    private JLabel scoreLabel; // Nhãn hiển thị số điểm
-    private JLabel opponentScoreLabel; // Nhãn hiển thị điểm đối thủ
-    private JLabel scoreTextLabel; // Nhãn hiển thị chữ "Điểm:"
-    private JLabel opponentScoreTextLabel; // Nhãn hiển thị chữ "Điểm đối thủ:"
-    private ImageSquare square1, square2; // Hai hình vuông với hình ảnh
-    private JLabel usernameLabel; // Nhãn hiển thị tên người dùng
-    private ArrayList<DraggableCircle> circles = new ArrayList<>(); // Danh sách các hình tròn
-    private Image backgroundImage; // Hình ảnh nền
+    private int opponentScore = 0;
+    private JLabel scoreLabel;
+    private JLabel opponentScoreLabel;
+    private JLabel scoreTextLabel;
+    private JLabel opponentScoreTextLabel;
+    private ImageSquare square1, square2;
+    private JLabel usernameLabel;
+    private ArrayList<DraggableCircle> circles = new ArrayList<>();
+    private Image backgroundImage;
     private String username;
     private String opponentName;
     private ClientControl ClientCtr;
+    private JLabel timerLabel; // Nhãn đếm ngược thời gian
+    private Timer gameTimer; // Timer cho đếm ngược
+    private int timeRemaining = 60; // Thời gian đếm ngược (60 giây)
+    private JButton finishButton; // Nút "Hoàn thành"
+    private boolean opponentFinished = false; // Biến lưu trạng thái đối thủ đã hoàn thành
+    private boolean userFinished = false;
+    private int opponentFinishTime = -1; // Thời gian hoàn thành của đối thủ (nếu có)
+    private JLabel opponentFinishTimeLabel; // Nhãn để hiển thị thời gian hoàn thành của đối thủ
 
     public CircleSquareGame(String username, String opponentName) {
         ClientCtr = new ClientControl();
         ClientCtr.openConnection();
-        this.username = username; // Gán tên người dùng
+        this.username = username;
         this.opponentName = opponentName;
+
         // Thiết lập JFrame
         setTitle("Trận đấu giữa " + username + " và " + opponentName);
         setSize(570, 600);
@@ -37,100 +48,204 @@ public class CircleSquareGame extends JFrame {
         setLocationRelativeTo(null);
 
         // Tải hình ảnh nền
-        backgroundImage = new ImageIcon("D:\\laptrinhmang\\src\\View\\images\\hinhnen.png").getImage(); // Thay đường dẫn với hình ảnh nền của bạn
+        backgroundImage = new ImageIcon("D:\\laptrinhmang\\src\\View\\images\\hinhnen.png").getImage();
 
-        // Tạo một JPanel để làm nền
+        // Tạo JPanel làm nền
         JPanel backgroundPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this); // Vẽ hình ảnh nền
+                g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
 
-                // Vẽ ô điểm trực tiếp lên nền
-                g.setColor(new Color(255, 255, 255, 200)); // Màu nền trắng với độ trong suốt
-                g.fillRoundRect(10, 5, 80, 30, 10, 10); // Vẽ hình chữ nhật cho ô điểm
-                g.fillRoundRect(400, 5, 140, 30, 10, 10); // Vẽ ô điểm cho đối thủ
+                // Vẽ ô điểm
+                g.setColor(new Color(255, 255, 255, 200));
+                g.fillRoundRect(10, 5, 80, 30, 10, 10);
+                g.fillRoundRect(400, 5, 140, 30, 10, 10);
             }
         };
         backgroundPanel.setLayout(null);
-        setContentPane(backgroundPanel); // Đặt JPanel làm nền
-        // Thêm nhãn hiển thị tên người dùng
-        usernameLabel = new JLabel(username + " vs " + opponentName); // Khởi tạo JLabel với tên người dùng
-        usernameLabel.setForeground(Color.BLACK); // Màu chữ
-        usernameLabel.setFont(new Font("Arial", Font.BOLD, 16)); // Đặt phông chữ
-        usernameLabel.setBounds(0, 10, 570, 30); // Đặt vị trí và kích thước
-        usernameLabel.setHorizontalAlignment(SwingConstants.CENTER); // Căn giữa
+        setContentPane(backgroundPanel);
+
+        // Nhãn tên người dùng
+        usernameLabel = new JLabel(username + " vs " + opponentName);
+        usernameLabel.setForeground(Color.BLACK);
+        usernameLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        usernameLabel.setBounds(0, 5, 570, 30);
+        usernameLabel.setHorizontalAlignment(SwingConstants.CENTER);
         backgroundPanel.add(usernameLabel);
 
-        // Thêm nhãn chữ "Điểm:"
+        // Nhãn "Điểm:"
         scoreTextLabel = new JLabel(username + ":");
-        scoreTextLabel.setForeground(Color.BLACK); // Màu chữ
-        scoreTextLabel.setBounds(15, 10, 50, 20); // Vị trí của nhãn "Điểm"
+        scoreTextLabel.setForeground(Color.BLACK);
+        scoreTextLabel.setBounds(15, 10, 50, 20);
         backgroundPanel.add(scoreTextLabel);
 
-        // Thêm nhãn số điểm
+        // Nhãn số điểm
         scoreLabel = new JLabel(String.valueOf(score));
-        scoreLabel.setForeground(Color.BLACK); // Màu chữ
+        scoreLabel.setForeground(Color.BLACK);
         scoreLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        scoreLabel.setBounds(65, 10, 50, 20); // Vị trí của nhãn số điểm
+        scoreLabel.setBounds(65, 10, 50, 20);
         backgroundPanel.add(scoreLabel);
 
-        // Thêm nhãn chữ "Điểm đối thủ:"
+        // Nhãn "Điểm đối thủ:"
         opponentScoreTextLabel = new JLabel(opponentName + ":");
-        opponentScoreTextLabel.setForeground(Color.BLACK); // Màu chữ
-        opponentScoreTextLabel.setBounds(410, 10, 100, 20); // Vị trí của nhãn "Điểm đối thủ"
+        opponentScoreTextLabel.setForeground(Color.BLACK);
+        opponentScoreTextLabel.setBounds(410, 10, 100, 20);
         backgroundPanel.add(opponentScoreTextLabel);
 
-        // Thêm nhãn số điểm đối thủ
+        // Nhãn số điểm đối thủ
         opponentScoreLabel = new JLabel(String.valueOf(opponentScore));
-        opponentScoreLabel.setForeground(Color.BLACK); // Màu chữ
+        opponentScoreLabel.setForeground(Color.BLACK);
         opponentScoreLabel.setFont(new Font("Arial", Font.PLAIN, 20));
-        opponentScoreLabel.setBounds(510, 10, 50, 20); // Vị trí của nhãn số điểm đối thủ
+        opponentScoreLabel.setBounds(510, 10, 50, 20);
         backgroundPanel.add(opponentScoreLabel);
 
-        // Tạo hình vuông đầu tiên với hình ảnh
-        square1 = new ImageSquare("C:\\Users\\admin\\Documents\\NetBeansProjects\\LoginSocket\\src\\View\\images\\caithung.png", 200, 150);
+        // Nhãn thời gian đếm ngược
+        timerLabel = new JLabel("Thời gian: " + timeRemaining + " giây");
+        timerLabel.setForeground(Color.RED);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timerLabel.setBounds(0, 25, 570, 30);
+        timerLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        backgroundPanel.add(timerLabel);
+
+        // Nhãn hiển thị thời gian hoàn thành của đối thủ
+        opponentFinishTimeLabel = new JLabel();
+        opponentFinishTimeLabel.setForeground(Color.BLUE);
+        opponentFinishTimeLabel.setBounds(370, 30, 200, 30);
+        opponentFinishTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        backgroundPanel.add(opponentFinishTimeLabel);
+
+        // Nút "Hoàn thành"
+        finishButton = new JButton("Hoàn thành");
+        finishButton.setBounds(200, 540, 150, 20);
+        finishButton.setFont(new Font("Arial", Font.PLAIN, 16));
+        finishButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                endGame();
+            }
+        });
+        backgroundPanel.add(finishButton);
+
+        // Tạo hình vuông với hình ảnh
+        square1 = new ImageSquare("D:\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
         square1.setBounds(250, 400, 200, 150);
         backgroundPanel.add(square1);
 
-        // Tạo hình vuông thứ hai với hình ảnh
-        square2 = new ImageSquare("C:\\Users\\admin\\Documents\\NetBeansProjects\\LoginSocket\\src\\View\\images\\caithung.png", 200, 150);
+        square2 = new ImageSquare("D:\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
         square2.setBounds(50, 400, 200, 150);
         backgroundPanel.add(square2);
 
-        // Tạo mảng giá trị ngẫu nhiên 0 hoặc 1
+        // Khởi tạo mảng ngẫu nhiên và các hình tròn
         int[] values = generateRandomValues(40);
-
-        // Tạo các hình tròn dựa trên giá trị trong mảng
         for (int i = 0; i < 40; i++) {
-            int x = (i % 10) * 50 + 50; // Tính toán vị trí x
-            int y = (i / 10) * 50 + 50; // Tính toán vị trí y
-
-            String imagePath;
-            if (values[i] == 0) {
-                imagePath = "C:\\Users\\admin\\Documents\\NetBeansProjects\\LoginSocket\\src\\View\\images\\caphe.png"; // Hạt cà phê
-            } else {
-                imagePath = "C:\\Users\\admin\\Documents\\NetBeansProjects\\LoginSocket\\src\\View\\images\\daunanh.png"; // Hạt đậu nành
-            }
-            DraggableCircle circle = new DraggableCircle(imagePath, 40, values[i]); // Sử dụng lớp DraggableCircle
+            int x = (i % 10) * 50 + 50;
+            int y = (i / 10) * 50 + 50;
+            String imagePath = values[i] == 0 ? "D:\\Game_Statics\\src\\View\\images\\caphe.png" : "D:\\Game_Statics\\src\\View\\images\\daunanh.png";
+            DraggableCircle circle = new DraggableCircle(imagePath, 40, values[i]);
             circle.setBounds(x, y, 40, 40);
             circles.add(circle);
             backgroundPanel.add(circle);
         }
 
+        // Khởi tạo timer cho đếm ngược
+        gameTimer = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                timeRemaining--;
+                timerLabel.setText("Thời gian: " + timeRemaining + " giây");
+
+                if (timeRemaining <= 0) {
+                    gameTimer.stop();
+                    endGame();
+                }
+            }
+        });
+        gameTimer.start();
+
         setVisible(true);
+    }
+
+    // Phương thức kết thúc trò chơi và gửi thời gian cho đối thủ
+    private void endGame() {
+        gameTimer.stop();
+        userFinished = true;
+        sendFinishTimeToOpponent();
+
+        if (opponentFinished) {
+            // Đối thủ đã hoàn thành -> So sánh điểm và thời gian
+            String result = compareScores();
+            JOptionPane.showMessageDialog(this, result);
+        } else {
+            // Đối thủ chưa hoàn thành -> Hiển thị thời gian hoàn thành của mình
+            JOptionPane.showMessageDialog(this, 
+                    "Trò chơi kết thúc!\nĐiểm của bạn: " + score + "\nThời gian còn lại: " + timeRemaining + " giây\nBạn hãy đợi đối thủ chơi xong");
+        }
+
+        disableCircles(); // Vô hiệu hóa các hình tròn
+    }
+    public void updateStatusOpponent(int time){
+        opponentFinished = true; // Biến lưu trạng thái đối thủ đã hoàn thành
+        opponentFinishTime = time;
+        
+        if (userFinished) {
+            // Mình đã hoàn thành -> So sánh điểm và thời gian
+            String result = compareScores();
+            JOptionPane.showMessageDialog(this, result);
+        }
+    }
+    
+    // Gửi thời gian hoàn thành cho đối thủ
+    private void sendFinishTimeToOpponent() {
+        // Gửi thời gian hoàn thành của người chơi hiện tại cho đối thủ
+        ClientCtr.sendTime(timeRemaining,opponentName);
+
+        if (opponentFinished) {
+            opponentFinishTimeLabel.setText("Hoàn thành trong:"+ opponentFinishTime + " giây");
+            Timer timer = new Timer(1500, e -> opponentFinishTimeLabel.setText("")); // 2000ms = 2 giây
+            timer.setRepeats(false); // Không lặp lại
+            timer.start(); // Bắt đầu đếm ngược
+        }
+    }
+
+    // So sánh điểm và thời gian giữa 2 người chơi để quyết định người thắng
+    private String compareScores() {
+        if (score > opponentScore) {
+            return "Bạn thắng với điểm số cao hơn!";
+        } else if (score < opponentScore) {
+            return opponentName + " thắng với điểm số cao hơn!";
+        } else {
+            if (timeRemaining > opponentFinishTime) {
+                return "Bạn thắng vì hoàn thành nhanh hơn!";
+            } else if(timeRemaining < opponentFinishTime){
+                return opponentName + " thắng vì hoàn thành nhanh hơn!";
+            }
+            else{
+               return  "Bạn và"+opponentName+" hòa nhau";
+            }   
+        }
+    }
+
+    // Vô hiệu hóa các hình tròn khi kết thúc trò chơi
+    private void disableCircles() {
+        for (DraggableCircle circle : circles) {
+            circle.setEnabled(false); // Không cho kéo nữa
+        }
     }
 
     private int[] generateRandomValues(int size) {
         Random random = new Random();
         int[] values = new int[size];
         for (int i = 0; i < size; i++) {
-            values[i] = random.nextInt(2); // Tạo giá trị ngẫu nhiên 0 hoặc 1
+            values[i] = random.nextInt(2);
         }
         return values;
     }
 
-    private void animateScoreLabel() {
+    public static void main(String[] args) {
+        new CircleSquareGame("hello", "hello1");
+    }
+     private void animateScoreLabel() {
         // Tăng kích thước
         scoreLabel.setFont(new Font("Arial", Font.BOLD, 25));
 
@@ -142,16 +257,11 @@ public class CircleSquareGame extends JFrame {
         timer.start();
     }
 
-    // Phương thức cập nhật điểm của đối thủ
-    public void updateOpponentScore(int points) {
-    }
-
-    public static void main(String[] args) {
-        new CircleSquareGame("hello", "hello1");
-    }
-
     public void updateScoreOpp(int score) {
         opponentScoreLabel.setText(String.valueOf(score));
+    }
+    public void opponentOut() {
+        JOptionPane.showMessageDialog(this, "Đối thủ đã thoát trận");
     }
 
     // Lớp ImageSquare để hiển thị hình vuông với hình ảnh

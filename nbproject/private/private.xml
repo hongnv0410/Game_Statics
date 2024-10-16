@@ -3,9 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/admin/Documents/NetBeansProjects/LoginSocket/src/Controller/ServerControl.java</file>
-            <file>file:/C:/Users/admin/Documents/NetBeansProjects/LoginSocket/src/View/CircleSquareGame.java</file>
-            <file>file:/C:/Users/admin/Documents/NetBeansProjects/LoginSocket/src/Controller/ClientControl.java</file>
+            <file>file:/D:/Game_Statics/src/View/CircleSquareGame.java</file>
+            <file>file:/D:/Game_Statics/src/Controller/ServerControl.java</file>
+            <file>file:/D:/Game_Statics/src/Controller/ClientControl.java</file>
         </group>
     </open-files>
 </project-private>
