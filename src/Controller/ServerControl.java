@@ -149,8 +149,15 @@ public class ServerControl {
                 }
                 else if(command.startsWith("sendTime:")){
                     int time =Integer.parseInt(command.split(":")[1]) ;
-                    String opponentName = command.split(":")[2];
-                    sendInviteTime(time, opponentName);
+                    String opponentName1 = command.split(":")[2];
+                    sendInviteTime(time, opponentName1);
+                    IsPlay = false;
+                    opponentName = null;
+                }
+                else if(command.startsWith("notifyExit:")){
+                    String opponentName1 = command.split(":")[1];
+                    System.out.println("gui cho"+opponentName1);
+                    sendNotification(opponentName1);
                     IsPlay = false;
                     opponentName = null;
                 }
@@ -208,7 +215,6 @@ public class ServerControl {
             try {
                 if(IsPlay == true)
                 {
-                    System.out.println("1");
                     sendNotification(opponentName);
                     IsPlay = false;
                     opponentName = null;
@@ -300,7 +306,7 @@ public class ServerControl {
                 } 
             }
         }
-
+       
     }
 
     public static void main(String[] args) {

@@ -242,6 +242,16 @@ public class ClientControl {
         }
     }
     
+    public void notifyOpponentOfExit(String opponentName){
+         try {
+            System.out.println("notifyExit:"+opponentName);
+            oos.writeObject("notifyExit:"+opponentName); // Gửi thời gian chơi về server
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
 }
 
 // Class chạy client
