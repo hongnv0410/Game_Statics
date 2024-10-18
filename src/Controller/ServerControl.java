@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import Model.User;
+import java.util.Arrays;
 
 public class ServerControl {
 
@@ -24,7 +25,7 @@ public class ServerControl {
     private ExecutorService pool = Executors.newFixedThreadPool(10); // Hồ bơi luồng để xử lý khách hàng
 
     public ServerControl() {
-        getDBConnection("test", "root", "123456"); // Kết nối đến cơ sở dữ liệu
+        getDBConnection("test", "root", ""); // Kết nối đến cơ sở dữ liệu
         openServer(serverPort); // Mở máy chủ
         while (true) {
             listenForClients(); // Liên tục lắng nghe các kết nối từ khách hàng
@@ -70,9 +71,9 @@ public class ServerControl {
         private ObjectInputStream ois; // Đầu vào đối tượng
         private User user; // Thông tin người dùng
         private boolean IsLogin = false;
-        private boolean IsPlay  = false;
+        private boolean IsPlay = false;
         private String opponentName = null;
-        
+
         public boolean isIsPlay() {
             return IsPlay;
         }
@@ -88,7 +89,7 @@ public class ServerControl {
         public void setOpponentName(String opponentName) {
             this.opponentName = opponentName;
         }
-        
+
         public ClientHandler(Socket socket) {
             this.clientSocket = socket; // Lưu kết nối khách hàng
         }
@@ -128,9 +129,16 @@ public class ServerControl {
                     boolean success = createUser(username, password); // Tạo người dùng
                     oos.writeObject(success ? "User created successfully!" : "Username already exists."); // Phản hồi kết quả
                 } else if (command.equals("getRankList")) {
-                    List<Object[]> rankList = getRankings(); // Lấy danh sách xếp hạng
+                    oos.writeObject("getRankList");
+                    List<Object[]> rankListOb = getRankings(); // Lấy danh sách xếp hạng
+                    List<String> rankList = new ArrayList<>();
+                    for (Object[] entry : rankListOb) {
+                        rankList.add(Arrays.toString(entry));
+                    }
                     oos.writeObject(rankList); // Gửi danh sách xếp hạng
+                    oos.flush();
                 } else if (command.equals("getOnlineUsers")) {
+                    oos.writeObject("getOnlineUsers");
                     List<String> onlineUsers = getOnlineUsers();
                     oos.writeObject(onlineUsers); // Gửi danh sách người dùng online
                     oos.flush(); // Đảm bảo dữ liệu được gửi
@@ -142,21 +150,19 @@ public class ServerControl {
                     String inviter = parts[1]; // Người đã mời
                     String response = parts[2]; // Phản hồi ("accept" hoặc "decline")
                     sendInviteResponseToInviter(inviter, this.user.getUserName(), response); // Gửi phản hồi tới người mời
-                }else if(command.startsWith("sendScore:")){
-                    int score =Integer.parseInt(command.split(":")[1]) ;
+                } else if (command.startsWith("sendScore:")) {
+                    int score = Integer.parseInt(command.split(":")[1]);
                     String opponentName = command.split(":")[2];
                     sendInviteScore(score, opponentName);
-                }
-                else if(command.startsWith("sendTime:")){
-                    int time =Integer.parseInt(command.split(":")[1]) ;
+                } else if (command.startsWith("sendTime:")) {
+                    int time = Integer.parseInt(command.split(":")[1]);
                     String opponentName1 = command.split(":")[2];
                     sendInviteTime(time, opponentName1);
                     IsPlay = false;
                     opponentName = null;
-                }
-                else if(command.startsWith("notifyExit:")){
+                } else if (command.startsWith("notifyExit:")) {
                     String opponentName1 = command.split(":")[1];
-                    System.out.println("gui cho"+opponentName1);
+                    System.out.println("gui cho" + opponentName1);
                     sendNotification(opponentName1);
                     IsPlay = false;
                     opponentName = null;
@@ -213,8 +219,7 @@ public class ServerControl {
 
         private void closeConnection() {
             try {
-                if(IsPlay == true)
-                {
+                if (IsPlay == true) {
                     sendNotification(opponentName);
                     IsPlay = false;
                     opponentName = null;
@@ -228,7 +233,7 @@ public class ServerControl {
                 if (clientSocket != null && !clientSocket.isClosed()) {
                     clientSocket.close(); // Đóng socket nếu chưa đóng
                 }
-                
+
                 clients.remove(this); // Xóa client khỏi danh sách quản lý
                 System.out.println("Client disconnected: " + clientSocket.getInetAddress()); // Thông báo ngắt kết nối
             } catch (IOException e) {
@@ -269,44 +274,46 @@ public class ServerControl {
                 inviterHandler.oos.flush();
                 inviteeHandler.oos.flush();
                 // Thêm thuộc tính đàn chơi game
-                inviterHandler.setIsPlay(true); 
+                inviterHandler.setIsPlay(true);
                 inviteeHandler.setIsPlay(true);
                 //Thêm tên đối thủ khi chấp nhận chơi
-                inviterHandler.setOpponentName(invitee); 
+                inviterHandler.setOpponentName(invitee);
                 inviteeHandler.setOpponentName(inviter);
 
                 System.out.println("Phòng chơi đã được tạo cho " + inviter + " và " + invitee);
             }
         }
-        
-        private void sendInviteScore(int score, String opponentName) throws IOException{
+
+        private void sendInviteScore(int score, String opponentName) throws IOException {
             for (ClientHandler client : clients) {
                 if (client.user != null && client.user.getUserName().equals(opponentName)) {
                     client.oos.writeObject("scoreOPP:" + score);
                     client.oos.flush();
                     return;
-                } 
+                }
             }
         }
-        private void sendInviteTime(int time, String opponentName) throws IOException{
+
+        private void sendInviteTime(int time, String opponentName) throws IOException {
             for (ClientHandler client : clients) {
                 if (client.user != null && client.user.getUserName().equals(opponentName)) {
                     client.oos.writeObject("timeOPP:" + time);
                     client.oos.flush();
                     return;
-                } 
+                }
             }
         }
-        private void sendNotification(String opponentName) throws IOException{
+
+        private void sendNotification(String opponentName) throws IOException {
             for (ClientHandler client : clients) {
                 if (client.user != null && client.user.getUserName().equals(opponentName)) {
                     client.oos.writeObject("Notification");
                     client.oos.flush();
                     return;
-                } 
+                }
             }
         }
-       
+
     }
 
     public static void main(String[] args) {

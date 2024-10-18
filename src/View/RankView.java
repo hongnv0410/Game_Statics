@@ -8,23 +8,27 @@ import java.awt.*;
 import java.util.List;
 
 public class RankView extends JFrame {
+
     private JTable table;
 
-    public RankView(List<Object[]> rankList) {
+    public RankView(List<String> rankList) {
         setTitle("Bảng xếp hạng");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(400, 300);
         setLocationRelativeTo(null);
-        
+
         // Tạo model cho bảng
         DefaultTableModel model = new DefaultTableModel(new String[]{"Số thứ tự", "Username", "Điểm"}, 0);
         table = new JTable(model);
-        
+
         // Thêm dữ liệu vào bảng
         for (int i = 0; i < rankList.size(); i++) {
-            Object[] entry = rankList.get(i);
-            String username = (String) entry[0];
-            int score = (Integer) entry[1];
+            String entry = rankList.get(i);
+            // Loại bỏ dấu ngoặc vuông và khoảng trắng không cần thiết
+            entry = entry.replace("[", "").replace("]", "").trim();
+            String[] parts = entry.split(","); // Tách username và điểm
+            String username = parts[0].trim(); // Lấy username
+            int score = Integer.parseInt(parts[1].trim()); // Lấy điểm và chuyển thành số nguyên
             model.addRow(new Object[]{i + 1, username, score}); // Thêm dữ liệu vào bảng
         }
 
@@ -46,7 +50,7 @@ public class RankView extends JFrame {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    public static void showRankList(List<Object[]> rankList) {
+    public static void showRankList(List<String> rankList) {
         SwingUtilities.invokeLater(() -> {
             RankView rankView = new RankView(rankList);
             rankView.setVisible(true);

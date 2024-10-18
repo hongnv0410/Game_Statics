@@ -19,6 +19,7 @@ public class ClientControl {
     private ObjectOutputStream oos; // Tái sử dụng chung cho tất cả các yêu cầu
     private ObjectInputStream ois;  // Tái sử dụng chung cho tất cả các yêu cầu
     private User user;
+    public List<String> RankList = new ArrayList<>();
     public List<String> onlineUsers = new ArrayList<>();
     private CircleSquareGame CSG = null;
 
@@ -110,19 +111,22 @@ public class ClientControl {
     }
 
     // Lấy danh sách xếp hạng
-    public List<Object[]> getRankList() {
-        List<Object[]> rankList = new ArrayList<>();
-        if (sendCommand("getRankList")) {
-            try {
-                Object response = ois.readObject(); // Đọc phản hồi từ server
-                if (response instanceof List) {
-                    rankList = (List<Object[]>) response; // Ép kiểu phản hồi về danh sách
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        }
-        return rankList; // Trả về danh sách xếp hạng
+//    public List<Object[]> getRankList() {
+//        List<Object[]> rankList = new ArrayList<>();
+//        if (sendCommand("getRankList")) {
+//            try {
+//                Object response = ois.readObject(); // Đọc phản hồi từ server
+//                if (response instanceof List) {
+//                    rankList = (List<Object[]>) response; // Ép kiểu phản hồi về danh sách
+//                }
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//            }
+//        }
+//        return rankList; // Trả về danh sách xếp hạng
+//    }
+    public void getRankList() {
+        sendCommand("getRankList");
     }
 
     public boolean sendInvite(String invitee) {
@@ -162,21 +166,24 @@ public class ClientControl {
                         }
                         if (command.startsWith("scoreOPP:")) {
                             int scoreOPP = Integer.parseInt(command.split(":")[1]);
-                            System.out.println("da nhan diem " +scoreOPP);
+                            System.out.println("da nhan diem " + scoreOPP);
                             CSG.updateScoreOpp(scoreOPP);
                         }
                         if (command.startsWith("timeOPP:")) {
                             int timeOPP = Integer.parseInt(command.split(":")[1]);
-                            System.out.println("da nhan thoi gian hoan thanh" +timeOPP);
+                            System.out.println("da nhan thoi gian hoan thanh" + timeOPP);
                             CSG.updateStatusOpponent(timeOPP);
                         }
                         if (command.startsWith("Notification")) {
                             CSG.opponentOut();
                         }
-                    } // Xử lý danh sách người dùng online
-                    else if (response instanceof List) {
-                        onlineUsers = (List<String>) response; // Ép kiểu về danh sách
-                    }
+                        if (command.equals("getOnlineUsers")) {
+                            onlineUsers = (List<String>) ois.readObject();
+                        }
+                        if (command.equals("getRankList")) {
+                            RankList = (List<String>) ois.readObject();
+                        }
+                    } 
                 } catch (IOException e) {
                     System.err.println("Lỗi kết nối: " + e.getMessage());
                     e.printStackTrace();
@@ -231,7 +238,7 @@ public class ClientControl {
             e.printStackTrace();
         }
     }
-    
+
     public void sendTime(int time, String opponentName) {
         try {
             System.out.println("sendTime:" + time + ":" + opponentName);
@@ -241,17 +248,17 @@ public class ClientControl {
             e.printStackTrace();
         }
     }
-    
-    public void notifyOpponentOfExit(String opponentName){
-         try {
-            System.out.println("notifyExit:"+opponentName);
-            oos.writeObject("notifyExit:"+opponentName); // Gửi thời gian chơi về server
+
+    public void notifyOpponentOfExit(String opponentName) {
+        try {
+            System.out.println("notifyExit:" + opponentName);
+            oos.writeObject("notifyExit:" + opponentName); // Gửi thời gian chơi về server
             oos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
+
 }
 
 // Class chạy client

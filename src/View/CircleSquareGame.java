@@ -131,11 +131,11 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(finishButton);
 
         // Tạo hình vuông với hình ảnh
-        square1 = new ImageSquare("D:\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
+        square1 = new ImageSquare("C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
         square1.setBounds(250, 400, 200, 150);
         backgroundPanel.add(square1);
 
-        square2 = new ImageSquare("D:\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
+        square2 = new ImageSquare("C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
         square2.setBounds(50, 400, 200, 150);
         backgroundPanel.add(square2);
 
@@ -144,7 +144,7 @@ public class CircleSquareGame extends JFrame {
         for (int i = 0; i < 40; i++) {
             int x = (i % 10) * 50 + 50;
             int y = (i / 10) * 50 + 50;
-            String imagePath = values[i] == 0 ? "D:\\Game_Statics\\src\\View\\images\\caphe.png" : "D:\\Game_Statics\\src\\View\\images\\daunanh.png";
+            String imagePath = values[i] == 0 ? "C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caphe.png" : "C:\\Users\\admin\\Game_Statics\\src\\View\\images\\daunanh.png";
             DraggableCircle circle = new DraggableCircle(imagePath, 40, values[i]);
             circle.setBounds(x, y, 40, 40);
             circles.add(circle);
