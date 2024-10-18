@@ -228,7 +228,7 @@ public class SignUp extends javax.swing.JFrame {
             if (result.equals("User created successfully!")) {
                 showMessage("Login succesfully!");
                 boolean isLoggedIn = true;
-                new CircleSquareGame(username);
+                new CircleSquareGame(username, "");
                 this.dispose();
             } else {
                 showMessage("Invalid username and/or password!" + result);

@@ -25,7 +25,7 @@ public class ServerControl {
     private ExecutorService pool = Executors.newFixedThreadPool(10); // Hồ bơi luồng để xử lý khách hàng
 
     public ServerControl() {
-        getDBConnection("test", "root", ""); // Kết nối đến cơ sở dữ liệu
+        getDBConnection("db_game", "root", "dazkiz1412"); // Kết nối đến cơ sở dữ liệu
         openServer(serverPort); // Mở máy chủ
         while (true) {
             listenForClients(); // Liên tục lắng nghe các kết nối từ khách hàng
