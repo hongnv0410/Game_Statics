@@ -21,6 +21,9 @@ public class InviteWindow extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        //
+        clientCtr.setInviteWindow(this);
+
         userPanel = new JPanel();
         userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS)); // Sắp xếp dọc
         JScrollPane scrollPane = new JScrollPane(userPanel); // Thêm scroll nếu danh sách quá dài
@@ -34,6 +37,7 @@ public class InviteWindow extends JFrame {
         startListeningForOnlineUsers();
 
         setVisible(true);
+
     }
 
     // Phương thức để hiển thị danh sách người dùng online
@@ -72,6 +76,7 @@ public class InviteWindow extends JFrame {
         boolean success = clientCtr.sendInvite(invitee); // Gửi lời mời tới server
         if (success) {
             JOptionPane.showMessageDialog(this, "Đã gửi lời mời tới " + invitee, "Mời chơi", JOptionPane.INFORMATION_MESSAGE);
+
         } else {
             JOptionPane.showMessageDialog(this, "Không thể gửi lời mời tới " + invitee, "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
@@ -89,5 +94,9 @@ public class InviteWindow extends JFrame {
                 }
             }
         }).start();
+    }
+
+    public void closeWindow() {
+        this.dispose();
     }
 }

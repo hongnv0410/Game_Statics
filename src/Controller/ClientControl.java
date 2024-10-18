@@ -8,11 +8,13 @@ import java.util.List;
 import Model.User;
 import View.CircleSquareGame;
 import View.ClientView;
+import View.InviteWindow;
+
 import java.io.IOException;
 import javax.swing.JOptionPane;
 
 public class ClientControl {
-
+    private InviteWindow inviteWindow;
     private Socket mySocket;
     private String serverHost = "localhost";
     private int serverPort = 8889;
@@ -24,6 +26,10 @@ public class ClientControl {
     private CircleSquareGame CSG = null;
 
     public ClientControl() {
+    }
+
+    public void setInviteWindow(InviteWindow inviteWindow) {
+        this.inviteWindow = inviteWindow;
     }
 
     // Mở kết nối đến server và khởi tạo các luồng IO
@@ -169,6 +175,8 @@ public class ClientControl {
                             handleInviteResponse(invitee, inviteeResponse); // Xử lý phản hồi lời mời
                         }
                         if (command.startsWith("gameStart:")) {
+                            // Tắt cửa sổ mời chơi
+                            inviteWindow.closeWindow();
                             // Tách tên người chơi đối thủ từ thông báo
                             String opponent = command.split(":")[1];
                             CSG = new CircleSquareGame(username, opponent);
