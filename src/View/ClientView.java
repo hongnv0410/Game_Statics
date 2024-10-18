@@ -10,4 +10,5 @@ public class ClientView {
         loginFrame.pack();
         loginFrame.setLocationRelativeTo(null); // Đặt vị trí ở giữa màn hình
     }
+
 }

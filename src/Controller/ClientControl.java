@@ -129,6 +129,15 @@ public class ClientControl {
         sendCommand("getRankList");
     }
 
+    public void insertPoint(String username, int point) {
+        try {
+            oos.writeObject("insertPoint:" + username + ":" + point); // Gửi thời gian chơi về server
+            oos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean sendInvite(String invitee) {
         try {
             oos.writeObject("invite:" + invitee); // Gửi yêu cầu mời chơi tới server

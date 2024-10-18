@@ -197,10 +197,20 @@ public class CircleSquareGame extends JFrame {
     private void endGame() {
         gameTimer.stop();
         userFinished = true;
+        System.out.println("diem ban1: "+score);
+        System.out.println("diem doi thu: "+opponentScore);
+
         if(checkOpponenntExit){
             sendFinishTimeToOpponent();
             if (opponentFinished) {
                 // Đối thủ đã hoàn thành -> So sánh điểm và thời gian
+                System.out.println("diem ban: "+score);
+                System.out.println("diem doi thu: "+opponentScore);
+
+                ClientCtr.insertPoint(username, score);
+                ClientCtr.insertPoint(opponentName, opponentScore);
+
+
                 String result1 = compareScores();
                 int result = JOptionPane.showOptionDialog(this,
                         result1+"\nBấm 'Quay lại' để thoát khỏi game.",
@@ -218,6 +228,7 @@ public class CircleSquareGame extends JFrame {
                 }
             } else {
                 // Đối thủ chưa hoàn thành -> Hiển thị thời gian hoàn thành của mình
+                ClientCtr.insertPoint(username, score);
                 JOptionPane.showMessageDialog(this,
                         "Trò chơi kết thúc!\nĐiểm của bạn: " + score + "\nThời gian còn lại: " + timeRemaining + " giây\nBạn hãy đợi đối thủ chơi xong");
             }
@@ -373,7 +384,19 @@ public class CircleSquareGame extends JFrame {
             g.drawString("+1", width - 50, height / 2 + 10);
 
             // Tạo timer để xóa "+1" sau 1 giây
-            Timer timer = new Timer(200, e -> repaint());
+            Timer timer = new Timer(500, e -> repaint());
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+        public void showWrong() {
+            Graphics g = getGraphics();
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Sai", width - 50, height / 2 + 10);
+
+            // Tạo timer để xóa "Wrong" sau 1 giây
+            Timer timer = new Timer(500, e -> repaint());
             timer.setRepeats(false);
             timer.start();
         }
@@ -409,6 +432,8 @@ public class CircleSquareGame extends JFrame {
                             scoreLabel.setText(String.valueOf(score));
                             square1.showPlusOne(); // Hiển thị "+1" trên hình vuông
                             ClientCtr.sendScore(score, opponentName);
+                        } else {
+                            square1.showWrong();
                         }
                         animateScoreLabel(); // Thêm hiệu ứng cho nhãn số điểm
                         setVisible(false); // Ẩn hình tròn khi đưa vào hình vuông
@@ -420,6 +445,8 @@ public class CircleSquareGame extends JFrame {
                             scoreLabel.setText(String.valueOf(score));
                             square2.showPlusOne(); // Hiển thị "+1" trên hình vuông
                             ClientCtr.sendScore(score, opponentName);
+                        } else {
+                            square2.showWrong();
                         }
                         animateScoreLabel();
                         setVisible(false);

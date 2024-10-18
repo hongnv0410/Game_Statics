@@ -166,6 +166,16 @@ public class ServerControl {
                     sendNotification(opponentName1);
                     IsPlay = false;
                     opponentName = null;
+                } else if (command.startsWith("insertPoint:")) {
+                    System.out.println("alo123:" + command);
+                    for(String s: command.split(":")){
+                        System.out.println(s);
+                    }
+                    String username = command.split(":")[1];
+                    int point = Integer.parseInt(command.split(":")[2]);
+                    System.out.println("user: " + username);
+                    System.out.println("point: " + point);
+                    insertPoint(username, point);
                 }
 
             }
@@ -205,6 +215,39 @@ public class ServerControl {
                 return false; // Thất bại khi tạo người dùng
             }
         }
+
+        private boolean insertPoint(String username, int newPoint) {
+            try {
+                // Truy vấn để lấy điểm hiện tại của người dùng
+                String selectQuery = "SELECT score FROM users WHERE username = '" + username + "'";
+                Statement stmt = con.createStatement();
+                ResultSet rs = stmt.executeQuery(selectQuery);
+
+                if (rs.next()) {
+                    int currentPoint = rs.getInt("score");
+                    System.out.println("Điểm hiện tại của " + username + " là " + currentPoint);
+
+                    // Kiểm tra nếu điểm mới lớn hơn điểm hiện tại
+                    if (newPoint > currentPoint) {
+                        // Thực hiện truy vấn cập nhật
+                        String updateQuery = "UPDATE users SET score = " + newPoint + " WHERE username = '" + username + "'";
+                        stmt.executeUpdate(updateQuery);
+                        System.out.println("Điểm của " + username + " đã được cập nhật lên " + newPoint);
+                        return true; // Cập nhật điểm thành công
+                    } else {
+                        System.out.println("Điểm mới không lớn hơn điểm hiện tại. Không cập nhật.");
+                        return false; // Không cập nhật vì điểm mới không lớn hơn điểm cũ
+                    }
+                } else {
+                    System.out.println("Người dùng không tồn tại.");
+                    return false; // Không tìm thấy người dùng
+                }
+            } catch (Exception e) {
+                e.printStackTrace(); // Xử lý lỗi
+                return false; // Thất bại khi cập nhật điểm
+            }
+        }
+
 
         private List<Object[]> getRankings() throws Exception {
             List<Object[]> rankingList = new ArrayList<>(); // Danh sách xếp hạng
