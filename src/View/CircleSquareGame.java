@@ -36,6 +36,7 @@ public class CircleSquareGame extends JFrame {
     private int opponentFinishTime = -1; // Thời gian hoàn thành của đối thủ (nếu có)
     private JLabel opponentFinishTimeLabel; // Nhãn để hiển thị thời gian hoàn thành của đối thủ
     private boolean checkOpponenntExit = true;
+    private boolean checkInRoom = true;
 
     public CircleSquareGame(String username, String opponentName) {
         ClientCtr = new ClientControl();
@@ -183,6 +184,7 @@ public class CircleSquareGame extends JFrame {
                 if (confirm == JOptionPane.YES_OPTION) {
                     // Thực hiện hành động khi người chơi chọn thoát, ví dụ:
                     ClientCtr.notifyOpponentOfExit(opponentName);  // Thông báo cho đối thủ
+                    checkInRoom = false;
                     dispose();  // Đóng cửa sổ game
                 }
             }
@@ -212,6 +214,7 @@ public class CircleSquareGame extends JFrame {
 
                 if (result == JOptionPane.OK_OPTION) {
                     // Đóng cửa sổ game khi người chơi bấm "Quay lại"
+                    checkInRoom = false;
                     dispose();
                 }
             } else {
@@ -235,6 +238,7 @@ public class CircleSquareGame extends JFrame {
 
             if (result == JOptionPane.OK_OPTION) {
                 // Đóng cửa sổ game khi người chơi bấm "Quay lại"
+                checkInRoom = false;
                 dispose();
             }
         }
@@ -243,6 +247,12 @@ public class CircleSquareGame extends JFrame {
     public void updateStatusOpponent(int time){
         opponentFinished = true; // Biến lưu trạng thái đối thủ đã hoàn thành
         opponentFinishTime = time;
+        if (opponentFinished && !userFinished) {
+            opponentFinishTimeLabel.setText("Hoàn thành trong:"+ opponentFinishTime + " giây");
+            Timer timer = new Timer(1500, e -> opponentFinishTimeLabel.setText("")); // 2000ms = 2 giây
+            timer.setRepeats(false); // Không lặp lại
+            timer.start(); // Bắt đầu đếm ngược
+        }
         
         if (userFinished) {
             // Mình đã hoàn thành -> So sánh điểm và thời gian
@@ -258,7 +268,8 @@ public class CircleSquareGame extends JFrame {
                 );
 
             if (result == JOptionPane.OK_OPTION) {
-                // Đóng cửa sổ game khi người chơi bấm "Quay lại"
+                // Đóng cửa sổ game khi người chơi bấm "Quay lại
+                checkInRoom = false;
                 dispose();
             }
         }
@@ -268,17 +279,12 @@ public class CircleSquareGame extends JFrame {
     private void sendFinishTimeToOpponent() {
         // Gửi thời gian hoàn thành của người chơi hiện tại cho đối thủ
         ClientCtr.sendTime(timeRemaining,opponentName);
-
-        if (opponentFinished) {
-            opponentFinishTimeLabel.setText("Hoàn thành trong:"+ opponentFinishTime + " giây");
-            Timer timer = new Timer(1500, e -> opponentFinishTimeLabel.setText("")); // 2000ms = 2 giây
-            timer.setRepeats(false); // Không lặp lại
-            timer.start(); // Bắt đầu đếm ngược
-        }
     }
 
     // So sánh điểm và thời gian giữa 2 người chơi để quyết định người thắng
     private String compareScores() {
+        System.out.println(score);
+        System.out.println(opponentScore);
         if (score > opponentScore) {
             return "Bạn thắng với điểm số cao hơn!";
         } else if (score < opponentScore) {
@@ -327,21 +333,25 @@ public class CircleSquareGame extends JFrame {
     }
 
     public void updateScoreOpp(int score) {
+        opponentScore++;
         opponentScoreLabel.setText(String.valueOf(score));
     }
     public void opponentOut() {
         checkOpponenntExit = false;
-        int result = JOptionPane.showConfirmDialog(
-            this,
-            "Đối thủ đã thoát trận. Bạn có muốn rời khỏi phòng không?",
-            "Đối thủ thoát trận",
-            JOptionPane.YES_NO_OPTION
-        );
+        if(checkInRoom){
+            int result = JOptionPane.showConfirmDialog(
+                this,
+                "Đối thủ đã thoát trận. Bạn có muốn rời khỏi phòng không?",
+                "Đối thủ thoát trận",
+                JOptionPane.YES_NO_OPTION
+            );
 
-        if (result == JOptionPane.YES_OPTION) {
-            // Nếu người chơi chọn "Yes", đóng cửa sổ game
-            dispose();  // Đóng cửa sổ game
-        } 
+            if (result == JOptionPane.YES_OPTION) {
+                // Nếu người chơi chọn "Yes", đóng cửa sổ game
+                checkInRoom = false;
+                dispose();  // Đóng cửa sổ game
+            } 
+        }
     }
   
     // Lớp ImageSquare để hiển thị hình vuông với hình ảnh

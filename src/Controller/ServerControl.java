@@ -111,13 +111,21 @@ public class ServerControl {
 
         private void handleClientRequest(Object o) throws Exception {
             if (o instanceof User) {
-                user = (User) o; // Chuyển đổi đối tượng thành User
+                User user = (User) o; // Chuyển đổi đối tượng thành User
                 if (checkUser(user)) {
-                    IsLogin = true;
-                    oos.writeObject("ok"); // Xác thực thành công
+                    if(!checkLoginYet(user.getUserName())){
+                        IsLogin = true;
+                        this.user = user;
+                        oos.writeObject("ok");// Xác thực thành công
+                    }
+                    else{
+                        oos.writeObject("ok");
+//                        oos.writeObject("");
+                        
+                    }
                 } else {
                     oos.writeObject("false"); // Xác thực thất bại
-                    IsLogin = true;
+                   
                 }
             } else if (o instanceof String) {
                 String command = (String) o; // Chuyển đổi đối tượng thành chuỗi
@@ -168,7 +176,7 @@ public class ServerControl {
         private List<String> getOnlineUsers() {
             List<String> onlineUsernames = new ArrayList<>(); // Danh sách người dùng online
             for (ClientHandler client : clients) {
-                if (client.user != null && client.IsLogin == true) {
+                if (client.user != null && client.IsLogin == true && client.IsPlay == false) {
                     onlineUsernames.add(client.user.getUserName()); // Thêm tên người dùng vào danh sách
                 }
             }
@@ -305,6 +313,19 @@ public class ServerControl {
                     return;
                 } 
             }
+        }
+        
+        private boolean checkLoginYet(String a) throws IOException{
+            System.out.println(clients.size());
+            if(clients.size()==0) return false;
+            for (ClientHandler client : clients) {
+                if (client.user != null && client.user.getUserName().equals(a))
+                {
+                    System.out.println("da co nguoi dung: "+a);
+                    return true; 
+                }
+            }
+            return false;
         }
        
     }
