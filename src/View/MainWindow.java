@@ -115,7 +115,14 @@ public class MainWindow extends JFrame implements ActionListener {
             // this.dispose();
             new InviteWindow(clientCtr, username);
         } else if (e.getSource() == btnRank) {
-            var rankList = clientCtr.getRankList();
+            clientCtr.getRankList();
+            try {
+                Thread.sleep(500); // Đợi 500ms để đảm bảo server phản hồi
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            var rankList = clientCtr.RankList;
+            System.out.println(rankList);
             if (!rankList.isEmpty()) {
                 RankView.showRankList(rankList);
             } else {
