@@ -52,7 +52,7 @@ public class CircleSquareGame extends JFrame {
         setLocationRelativeTo(null);
 
         // Tải hình ảnh nền
-        backgroundImage = new ImageIcon("D:\\laptrinhmang\\src\\View\\images\\hinhnen.png").getImage();
+        backgroundImage = new ImageIcon(getClass().getResource("/View/images/hinhnen.png")).getImage();
 
         // Tạo JPanel làm nền
         JPanel backgroundPanel = new JPanel() {
@@ -132,11 +132,11 @@ public class CircleSquareGame extends JFrame {
         backgroundPanel.add(finishButton);
 
         // Tạo hình vuông với hình ảnh
-        square1 = new ImageSquare("C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
+        square1 = new ImageSquare(getClass().getResource("/View/images/caithung.png").getPath(), 200, 150);
         square1.setBounds(250, 400, 200, 150);
         backgroundPanel.add(square1);
 
-        square2 = new ImageSquare("C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caithung.png", 200, 150);
+        square2 = new ImageSquare(getClass().getResource("/View/images/caithung.png").getPath(), 200, 150);
         square2.setBounds(50, 400, 200, 150);
         backgroundPanel.add(square2);
 
@@ -145,7 +145,7 @@ public class CircleSquareGame extends JFrame {
         for (int i = 0; i < 40; i++) {
             int x = (i % 10) * 50 + 50;
             int y = (i / 10) * 50 + 50;
-            String imagePath = values[i] == 0 ? "C:\\Users\\admin\\Game_Statics\\src\\View\\images\\caphe.png" : "C:\\Users\\admin\\Game_Statics\\src\\View\\images\\daunanh.png";
+            String imagePath = values[i] == 0 ? getClass().getResource("/View/images/caphe.png").getPath() : getClass().getResource("/View/images/daunanh.png").getPath();
             DraggableCircle circle = new DraggableCircle(imagePath, 40, values[i]);
             circle.setBounds(x, y, 40, 40);
             circles.add(circle);
@@ -212,6 +212,9 @@ public class CircleSquareGame extends JFrame {
           "Quay lại"
                 );
 
+//                ClientCtr.insertPoint(username, score); // Thêm điểm vào CSDL
+                ClientCtr.insertPoint(opponentName, opponentScore); // Thêm điểm vào CSDL
+
                 if (result == JOptionPane.OK_OPTION) {
                     // Đóng cửa sổ game khi người chơi bấm "Quay lại"
                     checkInRoom = false;
@@ -222,6 +225,7 @@ public class CircleSquareGame extends JFrame {
                 JOptionPane.showMessageDialog(this, 
                     "Trò chơi kết thúc!\nĐiểm của bạn: " + score + "\nThời gian còn lại: " + timeRemaining + " giây\nBạn hãy đợi đối thủ chơi xong");
             }
+            ClientCtr.insertPoint(username, score); // Thêm điểm vào CSDL
         disableCircles(); // Vô hiệu hóa các hình tròn
         }
         else{
@@ -381,7 +385,18 @@ public class CircleSquareGame extends JFrame {
             g.drawString("+1", width - 50, height / 2 + 10);
 
             // Tạo timer để xóa "+1" sau 1 giây
-            Timer timer = new Timer(200, e -> repaint());
+            Timer timer = new Timer(500, e -> repaint());
+            timer.setRepeats(false);
+            timer.start();
+        }
+
+        public void showWrong() {
+            Graphics g = getGraphics();
+            g.setColor(Color.RED);
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Sai", width - 50, height / 2 + 10);
+            // Tạo timer để xóa "Wrong" sau 1 giây
+            Timer timer = new Timer(500, e -> repaint());
             timer.setRepeats(false);
             timer.start();
         }
@@ -417,6 +432,8 @@ public class CircleSquareGame extends JFrame {
                             scoreLabel.setText(String.valueOf(score));
                             square1.showPlusOne(); // Hiển thị "+1" trên hình vuông
                             ClientCtr.sendScore(score, opponentName);
+                        } else {
+                            square1.showWrong(); // Hiển thị "Sai" trên hình vuông
                         }
                         animateScoreLabel(); // Thêm hiệu ứng cho nhãn số điểm
                         setVisible(false); // Ẩn hình tròn khi đưa vào hình vuông
@@ -428,6 +445,8 @@ public class CircleSquareGame extends JFrame {
                             scoreLabel.setText(String.valueOf(score));
                             square2.showPlusOne(); // Hiển thị "+1" trên hình vuông
                             ClientCtr.sendScore(score, opponentName);
+                        } else {
+                            square2.showWrong();
                         }
                         animateScoreLabel();
                         setVisible(false);

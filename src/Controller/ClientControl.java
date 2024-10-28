@@ -17,6 +17,7 @@ public class ClientControl {
     private InviteWindow inviteWindow;
     private Socket mySocket;
     private String serverHost = "localhost";
+//    private String serverHost = "26.201.168.94";
     private int serverPort = 8889;
     private ObjectOutputStream oos; // Tái sử dụng chung cho tất cả các yêu cầu
     private ObjectInputStream ois;  // Tái sử dụng chung cho tất cả các yêu cầu

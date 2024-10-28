@@ -25,7 +25,7 @@ public class ServerControl {
     private ExecutorService pool = Executors.newFixedThreadPool(10); // Hồ bơi luồng để xử lý khách hàng
 
     public ServerControl() {
-        getDBConnection("db_game", "root", "dazkiz1412"); // Kết nối đến cơ sở dữ liệu
+        getDBConnection("db_game", "root", ""); // Kết nối đến cơ sở dữ liệu
         openServer(serverPort); // Mở máy chủ
         while (true) {
             listenForClients(); // Liên tục lắng nghe các kết nối từ khách hàng
@@ -176,6 +176,15 @@ public class ServerControl {
                     System.out.println("user: " + username);
                     System.out.println("point: " + point);
                     insertPoint(username, point);
+                } else if (command.startsWith("insertPoint:")) {
+                    for(String s: command.split(":")){
+                        System.out.println(s);
+                    }
+                    String username = command.split(":")[1];
+                    int point = Integer.parseInt(command.split(":")[2]);
+                    System.out.println("user: " + username);
+                    System.out.println("point: " + point);
+                    insertPoint(username, point);
                 }
 
             }
@@ -190,6 +199,7 @@ public class ServerControl {
             }
             return onlineUsernames; // Trả về danh sách người dùng online
         }
+
 
         private boolean checkUser(User user) throws Exception {
             String query = "SELECT * FROM users WHERE username ='" + user.getUserName() + "' AND password ='" + user.getPassword() + "'"; // Truy vấn để xác thực người dùng
