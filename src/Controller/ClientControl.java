@@ -76,6 +76,7 @@ public class ClientControl {
                 return (String) o; // Trả về kết quả
             }
         } catch (Exception ex) {
+            System.out.println("Loi o day");
             ex.printStackTrace();
         }
         return null; // Không có dữ liệu

@@ -223,12 +223,13 @@ public class SignUp extends javax.swing.JFrame {
 
             ClientControl clientCtr = new ClientControl();
             clientCtr.openConnection();
-            clientCtr.createUser(username , pass);
+            clientCtr.createUser(username, pass);
             String result = clientCtr.receiveData();
             if (result.equals("User created successfully!")) {
                 showMessage("Login succesfully!");
                 boolean isLoggedIn = true;
-                new CircleSquareGame(username, "");
+                clientCtr.listenForInvites(jTextField1.getText());
+                new MainWindow(jTextField1.getText(), clientCtr);
                 this.dispose();
             } else {
                 showMessage("Invalid username and/or password!" + result);
