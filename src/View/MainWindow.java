@@ -38,7 +38,7 @@ public class MainWindow extends JFrame implements ActionListener {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                Image backgroundImage = new ImageIcon("C:\\Users\\admin\\Downloads\\z5862069502821_67adf93f75a33a466ba16ec8036cdc55.jpg").getImage();
+                Image backgroundImage = new ImageIcon("C:\\Users\\admin\\Downloads\\test.png").getImage();
                 g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
             }
         };
