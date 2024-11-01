@@ -49,7 +49,7 @@ public class MainWindow extends JFrame implements ActionListener {
         backgroundPanel.setLayout(new BorderLayout());
 
         // Tiêu đề
-        JLabel titleLabel = new JLabel("Game Hành Gà", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Game Tấm nhặt thóc", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Lato", Font.BOLD, 36));
         titleLabel.setForeground(new Color(139, 69, 19));  // Màu nâu sẫm
         backgroundPanel.add(titleLabel, BorderLayout.NORTH);
