@@ -1,0 +1,52 @@
+package Model;
+
+import java.io.Serializable;
+
+public class User implements Serializable {
+
+    private int id;
+    private String userName;
+    private String password;
+    private Integer score;
+
+    public User() {
+    }
+
+    public User(String username, String password) {
+        this.userName = username;
+        this.password = password;
+        this.score = 0;
+    }
+    
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getPassword() {
+        return password;
+
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+
+    }
+    public Integer getScore() {
+        return score;
+
+    }
+
+    public String getUserName() {
+        return userName;
+
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+
+    }
+}
