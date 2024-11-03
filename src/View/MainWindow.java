@@ -123,6 +123,7 @@ public class MainWindow extends JFrame implements ActionListener {
             loginFrame.pack();
             loginFrame.setLocationRelativeTo(null);
             this.dispose();
+            clientCtr.closeConnection();
         }
     }
 
