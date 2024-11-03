@@ -51,7 +51,7 @@ public class MainWindow extends JFrame implements ActionListener {
         // Tiêu đề
         JLabel titleLabel = new JLabel("Game Tấm nhặt thóc", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Lato", Font.BOLD, 36));
-        titleLabel.setForeground(new Color(139, 69, 19));  // Màu nâu sẫm
+        titleLabel.setForeground(new Color(255, 255, 255));  
         backgroundPanel.add(titleLabel, BorderLayout.NORTH);
 
         // Tạo panel cho các nút
