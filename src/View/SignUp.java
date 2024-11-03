@@ -234,7 +234,7 @@ public class SignUp extends javax.swing.JFrame {
             } else {
                 showMessage("Invalid username and/or password!" + result);
             }
-            clientCtr.closeConnection();
+            // clientCtr.closeConnection();
         } else {
             showMessage("password and re-password not same!");
 
