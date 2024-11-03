@@ -72,7 +72,7 @@ public class CircleSquareGame extends JFrame {
 
         // Nhãn tên người dùng
         usernameLabel = new JLabel(username + " vs " + opponentName);
-        usernameLabel.setForeground(Color.BLACK);
+        usernameLabel.setForeground(Color.WHITE);
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         usernameLabel.setBounds(0, 5, 570, 30);
         usernameLabel.setHorizontalAlignment(SwingConstants.CENTER);
